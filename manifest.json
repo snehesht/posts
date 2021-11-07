@@ -1,0 +1,19 @@
+{
+    "name": "Snehesh's Blog",
+    "timezone": "America/New_York",
+    "author": {
+        "name": "Snehesh",
+        "fullname": "Snehesh Thalapaneni",
+        "email": "mail@snehesh.me",
+        "github": "snehesht",
+        "hackernews": "snehesht",
+        "twitter": "snehesht",
+    },
+    "draftPostsFolder": "drafts",
+    "publishedPostsFolder": "published",
+    "assetsFolder": "assets",
+    "navigation": [
+        { "name": "About Me", "link": "/about-me", "contentPath": "about-me.md" },
+        { "name": "Github", "externalLink": "https://github.com/snehesht" }
+    ],
+}
