@@ -1,0 +1,31 @@
+name = "Snehesh's Blog"
+timezone = "America/New_York"
+draftPostsFolder = "drafts"
+publishedPostsFolder = "published"
+assetsFolder = "assets"
+
+[[authors]]
+name = "Snehesh"
+fullname = "Snehesh Thalapaneni"
+email = "mail@snehesh.me"
+github = "snehesht"
+hackernews = "snehesht"
+twitter = "snehesht"
+
+[[navigation]]
+name = "blog"
+link = "/blog"
+
+[[navigation]]
+name = "projects"
+link = "/projects"
+
+[[navigation]]
+name = "about"
+link = "/about"
+contentPath = "about-me.md"
+
+[[navigation]]
+name = "github"
+externalLink = "https://github.com/snehesht"
+
