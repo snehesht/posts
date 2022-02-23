@@ -1,7 +1,6 @@
 name = "Snehesh's Blog"
 timezone = "America/New_York"
-draftPostsFolder = "drafts"
-publishedPostsFolder = "published"
+publishedPostsFolder = "posts"
 assetsFolder = "assets"
 
 [[authors]]
