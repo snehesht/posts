@@ -35,6 +35,11 @@ cat << HEREDOC
 HEREDOC
 }
 
+function zero_pad(){
+  local question=$1
+  echo printf "%-30s :" $question
+}
+
 
 function read_input() {
   local question="$1"
@@ -76,8 +81,8 @@ function new_post() {
   color_text 36 "\nNew Post - Enter the post details\n"
   echo -e "`color_text_with_bg 5 30 43 Hint` `color_text 39 'Tags - Enter the tags for the post sperated by comma(,)'`"
   echo -e "`color_text_with_bg 5 30 43 Hint` `color_text 39 'Link - Start the link with / i.e eg: /<link>'`\n\n"
-  title=$(read_input 'Title     ' "")
-  author=$(read_input 'Author    ' "Snehesh")
+  title=$(read_input "Title" "")
+  author=$(read_input 'Authors    ' "Snehesh")
   link=$(read_input 'Link      ' "")
   tags=$(read_input 'Tags      ' "")
 
@@ -112,14 +117,24 @@ HEREDOC
 
 function publish_post() {
   local filepath="$1"
+  local publish="false"
+  echo -e "\nhead -n 16 $filepath"
+  head -n 16 $filepath
+  echo -e "\n------------------------------\n"
   while true; do
       read -p "Publish ${filepath} draft post? [y/n]  " yn
       case $yn in
-          [Yy]* ) create_draft_post; break;;
+          [Yy]* ) publish="true"; break;;
           [Nn]* ) exit;;
-          * ) usage; break;;
+          * ) break;;
       esac
   done
+  if [[ "$publish" == "true" ]]; then
+    sed -i 's/published: .*/published: true/g' $filepath
+    sed -i 's/modified: .*/modified: '$(date -u +"%Y-%m-%dT%H:%M:%SZ")'/g' $filepath
+    echo -e "\nPublished $filepath\n"
+  fi
+  exit 0
 }
 
 # Main Entrypoint
