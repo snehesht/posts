@@ -3,7 +3,7 @@ title: Example Markdown File
 author: Snehesh
 tags: demo
 link: /example-markdown-file
-published: false
+published: true
 created: 2022-02-23T15:03:35Z
 modified: 2022-02-23T15:03:35Z
 ---

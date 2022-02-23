@@ -3,7 +3,7 @@ title: React + Typescript cheatsheet
 author: Snehesh
 tags: react, typescript, cheatsheet, jsx
 link: /react-typescript-cheetsheet
-published: false
+published: true
 created: 2022-02-23T15:06:02Z
 modified: 2022-02-23T15:06:02Z
 ---
