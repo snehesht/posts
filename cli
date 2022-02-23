@@ -1,0 +1,139 @@
+#!/usr/bin/env bash
+
+set -o errexit -o pipefail -o noclobber -o nounset
+
+# Color Codes
+color_text() {
+  local color="${1:-39}"
+  shift
+  local text="$*"
+  echo -e "\e[1;${color}m${text}\e[0m"
+}
+
+color_text_with_bg() {
+  local set="${1:-1}"
+  local fgcolor="${2:-39}"
+  local bgcolor="${3:-49}"
+  shift "3"
+  local text="$*"
+  echo -e "\e[${set};${fgcolor};${bgcolor}m ${text} \e[0m"
+}
+
+function usage() {
+cat << HEREDOC
+
+  Posts v1.0 - CLI to create blog posts in a Markdown format.
+  ----------
+
+  Usage: $progname [--help] [--new] [--publish POST_FILE_PATH]
+
+  optional arguments:
+    -h, --help                    show help message
+    -n, --new                     create a new draft post
+    -p, --publish POST_FILE_PATH  Publish a draft post by file path
+
+HEREDOC
+}
+
+
+function read_input() {
+  local question="$1"
+  local default="$2"
+  local allow_empty="false"
+  local answer=""
+  local valid=false
+  local prompt=`color_text_with_bg 1 30 107 ${question}`
+
+  if [[ "$default" != "" ]]; then
+    allow_empty="true"
+    prompt="`color_text_with_bg 1 30 107 ${question} ` ❨ default: `color_text 35 ${default}` ❩"
+  fi
+
+  while [[ $valid == "false" ]]; do
+      read -p "${prompt} ⤨  " answer
+      if [[ "$answer" == "" ]]; then
+        if [[ "$allow_empty" == "true" ]]; then
+          answer="$default"
+          valid=true
+          break
+        fi
+      else 
+        valid=true
+        break
+      fi
+  done
+  echo $answer
+}
+
+function new_post() {
+  local new_post=0
+  local filenameprefix=$(date -u +"%Y%m%d")
+  local filenamesuffix=".md"
+  local title=""
+  local author=""
+  local link=""
+  local tags=""
+  color_text 36 "\nNew Post - Enter the post details\n"
+  echo -e "`color_text_with_bg 5 30 43 Hint` `color_text 39 'Tags - Enter the tags for the post sperated by comma(,)'`"
+  echo -e "`color_text_with_bg 5 30 43 Hint` `color_text 39 'Link - Start the link with / i.e eg: /<link>'`\n\n"
+  title=$(read_input 'Title     ' "")
+  author=$(read_input 'Author    ' "Snehesh")
+  link=$(read_input 'Link      ' "")
+  tags=$(read_input 'Tags      ' "")
+
+  local filename="$filenameprefix$(echo $link | sed 's/[ ,.-;!@#$+=:%^&*()-/]/\_/g')$filenamesuffix"
+  local filepath="$(pwd)/posts/$(date -u +"%Y")/$filename"
+
+  # Ensure the directory exists
+  mkdir -p $(dirname $filepath)
+
+  if [[ -f "$filepath" ]]; then
+    echo "Draft already exists: $filepath"
+    return 1
+  fi
+
+bash -c "cat > $filepath" <<HEREDOC
+---
+title: $title
+author: $author
+tags: $tags
+link: $link
+published: false
+created: $(date -u +"%Y-%m-%dT%H:%M:%SZ")
+modified: $(date -u +"%Y-%m-%dT%H:%M:%SZ")
+---
+
+# ${title}
+HEREDOC
+
+  echo -e "\nDraft created: $filepath\n"
+  exit 0
+}
+
+function publish_post() {
+  local filepath="$1"
+  while true; do
+      read -p "Publish ${filepath} draft post? [y/n]  " yn
+      case $yn in
+          [Yy]* ) create_draft_post; break;;
+          [Nn]* ) exit;;
+          * ) usage; break;;
+      esac
+  done
+}
+
+# Main Entrypoint
+progname=$(basename $0)
+OPTS=$(getopt -o "hnp:" --long "help,new,publish:" -n "$progname" -- "$@")
+if [ $? != 0 ] ; then echo "Error in command line arguments." >&2 ; exit 1 ; fi
+eval set -- "$OPTS"
+
+while true; do
+  case "$1" in
+    -h | --help ) usage; exit; ;;
+    -n | --new ) new_post; shift ;;
+    -p | --publish ) publish_post $2; shift 2 ;;
+    -- ) usage; shift; break ;;
+    * ) break ;;
+  esac
+done

@@ -1,5 +1,14 @@
+---
+title: Example Markdown File
+author: Snehesh
+tags: demo
+link: /example-markdown-file
+published: false
+created: 2022-02-23T15:03:35Z
+modified: 2022-02-23T15:03:35Z
+---
 
-# Gist markdown examples
+# Example Markdown File
 
 A collection of Markdown code and tricks that were tested to work in Gist.
 
