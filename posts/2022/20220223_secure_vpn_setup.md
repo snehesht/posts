@@ -1,19 +1,21 @@
 ---
-title: Secure VPN setup
-author: Snehesh
-tags: vpn,security
-link: /secure-vpn-setup
-published: false
-created: 2022-02-23T21:34:28Z
-modified: 2022-02-23T21:34:28Z
+Title: Secure VPN setup
+Summary: Tutorial to setup secure VPN
+Author: Snehesh
+Tags:
+  - vpn
+  - security
+Slug: /secure-vpn-setup
+Published: true
+Created: 2022-02-23T21:34:28Z
+Modified: 2022-02-23T21:34:28Z
 ---
 
 # Secure VPN setup
 
-There are few good choices like OpenVPN, [SoftEther](https://www.softether.org/), [Pritunl](http://pritunl.com) etc. If you prefer something much more robust, I'd suggest to take look at [strongSwan](https://www.strongswan.org) (IPSec + ESP). If you prefer something temporary just use ssh tunnel `ssh -D 9050 user@server` ,  install [proxychains](https://github.com/rofl0r/proxychains-ng) and `proxychains firefox  `, vola you're traffic is encrypted. The only issue is, it's hard use socks proxy on un-rooted mobile phone and sessions are temporary.
+There are few good choices like OpenVPN, [SoftEther](https://www.softether.org/), [Pritunl](http://pritunl.com) etc. If you prefer something much more robust, I'd suggest to take look at [strongSwan](https://www.strongswan.org) (IPSec + ESP). If you prefer something temporary just use ssh tunnel `ssh -D 9050 user@server` , install [proxychains](https://github.com/rofl0r/proxychains-ng) and `proxychains firefox  `, vola you're traffic is encrypted. The only issue is, it's hard use socks proxy on un-rooted mobile phone and sessions are temporary.
 
 I choose OpenVPN since it's widely used and it's easy to configure. However OpenVPN has it's drawbacks, it's easier to detect if a person is using OpenVPN by checking the packet MTU size.
-
 
 ### Creating FreeBSD server on Azure
 
@@ -25,20 +27,16 @@ Don't forget to change the default username (azureuser) and block all ports exce
 
 ![](https://i.imgur.com/Fmjcq03.png)
 
-
 ### Enable IP packet forwarding
 
 Enable IP forwarding on the server by setting `net.inet.ip.forwarding=1` in sysctl.conf file.
 
-
     sudo sysctl net.inet.ip.forwarding=1
     sudo nano /etc/sysctl.conf
-
 
 ### Enable packet filter (pf)
 
 `pf` is the freebsd version of iptables, OpenVPN `10.8.0.0/24` must be routed properly, open `/etc/pf.conf` as root and add the following configuration
-
 
     ext_if=hn0 # if your interface is eth0 then use that instead
     openvpn_subnet="{10.8.0.0/24}"
@@ -46,21 +44,17 @@ Enable IP forwarding on the server by setting `net.inet.ip.forwarding=1` in sysc
     # similar to iptables -t nat -a POSTROUTING -s 10.8.0.0/24 -o hn0 -j MASQUERADE
     nat on $ext_if from $openvpn_subnet to any -> ($ext_if)
 
-
-Start pf by default using `sudo sysrc pf=yes`  after system reboot.
-
+Start pf by default using `sudo sysrc pf=yes` after system reboot.
 
 ### Installing DNSCrypt and Unbound
 
 Install dnscrypt-proxy on the FreeBSD ` sudo pkg install dnscrypt-proxy`. Update the `/etc/rc.conf` file so the dnscrypt autostarts after reboots, add the following config to `/etc/rc.conf`. `cs-useast` is the dnscrypt provider is closest to the server location, you can choose one that's closest to you from this [list](https://github.com/jedisct1/dnscrypt-proxy/blob/master/dnscrypt-resolvers.csv)
-
 
     # dnscrypt-proxy
     dnscrypt_proxy_enable="YES"
     dnscrypt_proxy_flags="-a 127.0.0.1:54"
     dnscrypt_proxy_resolver="cs-useast"
     dnscrypt_proxy_logfile="/dev/null"
-
 
 Install unbound to act as a local dns cache `sudo pkg install unbound`. Edit the unbound config file ` /var/unbound/unbound.conf` using sudo and add the following configuration
 
@@ -143,7 +137,6 @@ Reboot the server `sudo reboot` and test the DNS resolution with the following c
         ;; WHEN: Sun Nov 13 03:16:49 2016
         ;; MSG SIZE  rcvd: 44
 
-
 ### Installing OpenVPN
 
 Install openvpn and easy-rsa by running `sudo pkg install openvpn easy-rsa`. Create a new directory `sudo mkdir /usr/local/etc/openvpn` and copy sample configuration file and easy-rsa files.
@@ -172,7 +165,6 @@ Edit the `vars` file under `/usr/local/etc/openvpn/easy-rsa` and change the foll
                                          # the certs or if they are compromised, you can revoke them.
 
 Now start generating the keys, now run `sudo ./easyrsa.real help` to print the list of commands. Lets start with building PKI
-
 
 ### Build Public Key Infrastructure (PKI)
 
@@ -313,7 +305,6 @@ Copy the individual keys to the respective client.
     # archive the above files for easy distribution.
     # use scp or rsync to download the archive.
     tar czvf desktop.tar.gz pki/ca.crt pki/issued/desktop.crt pki/private/desktop.key
-
 
 ### Generate OpenVPN server and client config files
 
